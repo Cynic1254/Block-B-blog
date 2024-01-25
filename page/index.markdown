@@ -8,10 +8,10 @@ layout: default
 # Using Clang for static reflection
 
 ## What
-Static reflection is a key component to writing dynamic code which is easily integrated into systems. However despite this there are few solutions for drag and drop static reflection out there. My aim for this project was to fill this hole with an easy to integrate console based application which will parse c++ files and generate code based on the symbols in them.
+Static reflection is a key component to writing dynamic code which is easily integrated into systems. However, despite this there are few solutions for drag and drop static reflection out there. My aim for this project was to fill this hole with an easy to integrate console-based application which will parse c++ files and generate code based on the symbols in them.
 
 ### Inspiration
-For this project I took a lot of inspiration from Unreal Engine's reflection system. Unreal Engine's reflection system has a nice way of handling reflection where the user doesn't need to worry about adding their classes to specific functions or files so that the code is able to run it, Instead the user can use macro's to describe what they want to happen with their code:
+For this project I took a lot of inspiration from Unreal Engine's reflection system. Unreal Engine's reflection system has a nice way of handling reflection where the user doesn't need to worry about adding their classes to specific functions or files so that the code is able to run it, Instead the user can use macros to describe what they want to happen with their code:
 
 ```cpp
 UCLASS()
@@ -41,7 +41,7 @@ public:
 
 In this snippet the class is marked with the `UCLASS()` property which is detected by unreal and the class is added to it's reflection system. Variables are marked with the `UPROPERTY()` macro and additional settings are passed as parameters, these settings tell unreal that the variables cannot be edited by blueprints and when inspected they will be under the Movement category.
 
-My aim was to make a small console based application that the user can invoke just before building their c/c++ application that will generate files based on properties specified by the user similar to how unreal engine's properties work. The difference in my software will be that the user is able to control what gets generated based on what properties.
+My aim was to make a small console-based application that the user can invoke just before building their c/c++ application that will generate files based on properties specified by the user like how unreal engine's properties work. The difference in my software will be that the user is able to control what gets generated based on what properties.
 
 as an example:
 ```cpp
@@ -66,12 +66,12 @@ Foo_table["Func"] = &Foo::Func();
 Foo_table["Var"] = &Foo::Var;
 }
 ```
-In this example you can see a small input class which is marked with Macro's, these macro's tell the program that this class and these members should be remembered. Additionally parameters have been provided to mark the class as being accessible in Lua. The program sees these macro's and parameters and automatically generates the output file based on them. The output file contains a function to create bindings for Lua.
+In this example you can see a small input class which is marked with Macro's, these macros tell the program that this class and these members should be remembered. Additionally, parameters have been provided to mark the class as being accessible in Lua. The program sees these macros and parameters and automatically generates the output file based on them. The output file contains a function to create bindings for Lua.
 
 ## Why
 Static reflection or reflection in general is a key component to software development and especially important for (game) engines where users should get as much feedback as possible and be able to do as much as possible with as little effort as possible.
 
-Imagine you have a small Entity Component System (ECS) based engine you've made and you want to allow users to create components themselves. This of course isn't that difficult, you simply expose part of your API that provides helper functions for components and voila we have a simple component.
+Imagine you have a small Entity Component System (ECS) based engine you've made, and you want to allow users to create components themselves. This of course isn't that difficult; you simply expose part of your API that provides helper functions for components and voila we have a simple component.
 ```cpp
 struct Physics
 {
@@ -83,9 +83,9 @@ struct Physics
 ```
 The above code showcases a simple Physics component that could be made using a Data Oriented Design (DOD) approach. simple enough right?
 
-Now imagine the user creates an entity and adds the Physics component to it. The user runs the program and... the entity flies in the wrong direction. To fix this the user has to edit their code and recompile the program which takes time. Instead it would be cool if the user is able to inspect the entity and edit the values of the Physics component during runtime.
+Now imagine the user creates an entity and adds the Physics component to it. The user runs the program and... the entity flies in the wrong direction. To fix this the user must edit their code and recompile the program which takes time. Instead, it would be cool if the user is able to inspect the entity and edit the values of the Physics component during runtime.
 
-Of course you already thought of this since you're such an amazing programmer and already implemented an inspector class. One problem though, for the inspector to know what it should display it has to know about the class. Not a big problem right? you can just create a template that the user can specialize to describe how the inspector should display the class. Of course the component also needs to be registered so lets add a function which the user has to call during startup to tell the engine about the component.
+Of course, you already thought of this since you're such an amazing programmer and already implemented an inspector class. One problem though, for the inspector to know what it should display it has to know about the class. Not a big problem, right? you can just create a template that the user can specialize to describe how the inspector should display the class. Of course, the component also needs to be registered so let’s add a function which the user must call during startup to tell the engine about the component.
 ```cpp
 struct Physics
 {
@@ -115,19 +115,19 @@ void EngineClass::Initialize()
   ecs_->RegisterComponent<components::Physics>("Physics");
 }
 ```
-Suddenly adding a new components leaves a lot of work up to the user and a lot of files that the user has to edit. Meanwhile in game engines whenever someone makes a new component all of this code that is required to make it work is generated by the engine itself. This is the power of reflection allowing the developer of the engine to pretend that the component already exists even if it doesn't, then whenever the component (or any other component) does get created the engine can generate code for itself that allows it to integrate the component. This way all the user has to do is create the component and mark it with the correct parameters, this allows users to focus on what is really important: Making their program.
+Suddenly adding a new component leaves a lot of work up to the user and a lot of files that the user must edit. Meanwhile in game engines whenever someone makes a new component all this code that is required to make it work is generated by the engine itself. This is the power of reflection allowing the developer of the engine to pretend that the component already exists even if it doesn't, then whenever the component (or any other component) does get created the engine can generate code for itself that allows it to integrate the component. This way all the users must do is create the component and mark it with the correct parameters, this allows users to focus on what is important: Making their program.
 
 ## How
-The first step to making the program is finding a way to parse c++ files and extract all useful symbols from them. Depending on how well you want your parser to work you can parse it yourself or have a library do it for you. For this project we will be using clang and their c++ API ClangTooling, Clang has the advantage of being a well tested compiler so most c++ code you throw at it will be correctly parsed into an AST (We'll discuss what that is later). since I mainly develop on windows getting the clang source code was more of a challenge than I would like to admit but the short of it is that LLVM (the organization maintaining clang) doesn't provide any builds for windows other than libclang which is the c version of the api. Instead we will have to build clang ourselves and that is exactly what I did.
+The first step to making the program is finding a way to parse c++ files and extract all useful symbols from them. Depending on how well you want your parser to work you can parse it yourself or have a library do it for you. For this project we will be using clang and their c++ API ClangTooling, Clang has the advantage of being a well tested compiler so most c++ code you throw at it will be correctly parsed into an AST (We'll discuss what that is later). since I mainly develop on windows getting the clang source code was more of a challenge than I would like to admit but the short of it is that LLVM (the organization maintaining clang) doesn't provide any builds for windows other than libclang which is the c version of the api. Instead, we will have to build clang ourselves and that is exactly what I did.
 
 A small note: if you download the project's source code from the repo you will manually have to add clang to the External folder as it is a bit too big to include otherwise.
 
-Although Clang is a widely used compiler it's libraries are not as widely used, due to this there is not much information to find about ClangTooling outside of the [doxygen](https://clang.llvm.org/doxygen/namespaceclang_1_1tooling.html)
+Although Clang is a widely used compiler its libraries are not as widely used, due to this there is not much information to find about ClangTooling outside of the [doxygen](https://clang.llvm.org/doxygen/namespaceclang_1_1tooling.html)
 
-Once setup the parser can be invoked by creating a `clang::tooling::ClangTool` and calling `.run` on it. When creating the tool you will need to provide a `CompilationDatabase` which contains the compile commands used to compile the files. Additionally the tool also requires a vector containing the paths of all the files to compile.
+Once setup the parser can be invoked by creating a `clang::tooling::ClangTool` and calling `.run` on it. When creating the tool, you will need to provide a `CompilationDatabase` which contains the compile commands used to compile the files. Additionally, the tool also requires a vector containing the paths of all the files to compile.
 
 ### The CompilationDatabase
-The CompilationDatabase must be inherited from `clang::tooling::CompilationDatabase` and implement the `getCompileCommands` function which takes in a file path and returns a vector containing all compile commands that apply to that file. clang provides a couple classes which inherit from `CompilationDatabase` that could be used, these classes are: `ArgumentsAdjustingCompilations`, `FixedCompilationDatabase` and `JSONCompilationDatabase`. All of these classes provide their own ways of handling compile commands however, none of them are particularly useful so we create our own simple class which just adds the arguments to whatever file is passed in.
+The CompilationDatabase must be inherited from `clang::tooling::CompilationDatabase` and implement the `getCompileCommands` function which takes in a file path and returns a vector containing all compile commands that apply to that file. clang provides a couple classes which inherit from `CompilationDatabase` that could be used, these classes are: `ArgumentsAdjustingCompilations`, `FixedCompilationDatabase` and `JSONCompilationDatabase`. All these classes provide their own ways of handling compile commands however, none of them are particularly useful so we create our own simple class which just adds the arguments to whatever file is passed in.
 
 ```cpp
 //header
@@ -157,7 +157,7 @@ std::vector<clang::tooling::CompileCommand> SimpleOptionParser::getCompileComman
     return commands;
 }
 ```
-This class takes in a list of strings for it's constructor and simply outputs them whenever getCompileCommands is called.
+This class takes in a list of strings for its constructor and simply outputs them whenever getCompileCommands is called.
 
 ### Running Clang
 in our main function we simply pass an instance of the optionsParser to the tool:
@@ -176,7 +176,7 @@ tool.run(clang::tooling::newFrontendActionFactory<ASTFrontendAction>().get());
 ### Running our custom code
 The `ASTFrontendAction` class has a singular purpose (at least as far as we are concerned) which is to create an `ASTConsumer` for each file. This is done by implementing the `CreateASTConsumer` function which will take a `compilerInstance` and a file and return a `std::unique_ptr` to a `clang::ASTConsumer`
 
-The `ASTConsumer` is responsible for handling parsed c++ files. this is done through yet another class called a `RecursiveASTVisitor` The `ASTConsumer` class provides the virtual `HandleTranslationUnit` function which takes in an `ASTContext`
+The `ASTConsumer` is responsible for handling parsed c++ files. this is done through, yet another class called a `RecursiveASTVisitor` The `ASTConsumer` class provides the virtual `HandleTranslationUnit` function which takes in an `ASTContext`
 
 ```cpp
 //implement consumer
@@ -203,7 +203,7 @@ void ASTConsumer::HandleTranslationUnit(clang::ASTContext &context) {
     parser.TraverseDecl(context.getTranslationUnitDecl());
 }
 ```
-That's a lot of classes isn't it? so let's go through what clang is doing step by step:
+That's a lot of classes, isn't it? so let's go through what clang is doing step by step:
 
 - First of when the `run` function is called we passed it a `FrontendActionFactory` which is simply responsible for creating an instance of our custom `ASTFrontendAction` class for every file it will parse.
 - After that for every file that gets parsed a new `ASTFrontendAction` will be created and the `CreateASTConsumer` function is called on it with the current file.
@@ -217,7 +217,7 @@ as you might realize the behavior of `RecursiveASTVisitor` is just what we need 
 ### Extracting the data
 now that we have finally reached the point where we can extract the parsed data let's talk about how we want to save that data.
 
-first let's take a look at how clang structures the AST, This can be done by invoking clang.exe with the `-Xclang -ast-dump -fsyntax-only` flags running it on this small test snippet:
+first let's take a look at how clang structures the AST, this can be done by invoking clang.exe with the `-Xclang -ast-dump -fsyntax-only` flags running it on this small test snippet:
 ```cpp
 #pragma once
 
@@ -261,7 +261,7 @@ TranslationUnitDecl 0x17e93276f58 <<invalid sloc>> <invalid sloc>
 ```
 quite confusing right? I recommend testing it yourself as with the colors that clang adds it will be a lot easier to see what's going on.
 
-For now the part that we are interested in is this:
+For now, the part that we are interested in is this:
 ```
 CXXRecordDecl 0x1f0435a4810 <C:\Users\games\source\github\Code-Generation\Code_Generation\include\Linker.hpp:9:1, line:16:1> line:9:7 class Linker definition
   |-DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
@@ -286,16 +286,16 @@ CXXRecordDecl 0x1f0435a4810 <C:\Users\games\source\github\Code-Generation\Code_G
   `-CXXMethodDecl 0x1f0435a4b30 <line:15:5, col:52> col:10 invalid Link 'void (const int &)'
     `-ParmVarDecl 0x1f0435a4a38 <col:15, col:46> col:46 invalid parser 'const int &'
 ```
-this output should give us a good idea of how the `RecursiveASTVisitor` will work so lets get back to the code shall we.
+this output should give us a good idea of how the `RecursiveASTVisitor` will work so let’s get back to the code shall we.
 
-The `RecursiveASTVisitor` works a little differently than the other classes we have inherited from. To inherit from this class you must provide the class as a template argument like so:
+The `RecursiveASTVisitor` works a little differently than the other classes we have inherited from. To inherit from this class, you must provide the class as a template argument like so:
 ```cpp
 class ASTFileParser : public clang::RecursiveASTVisitor<ASTFileParser> {
 }
 ```
 As mentioned above this class is created and managed by the `ASTConsumer` class. The `ASTConsumer` creates an instance of the visitor and calls the `TraverseDecl` function passing the ASTContext as it's argument. The `TraverseDecl` function is a general version of the TraverseFunctions available on the visitor class. The way how `TraverseDecl` works is as follows:
-- First we test if the Decl is valid
-- After verifying it's validity we check if the user wants to visit implicit declarations which is false by default.
+- First, we test if the Decl is valid
+- After verifying its validity we check if the user wants to visit implicit declarations which is false by default.
 - Then we check what kind of Decl we have and call TraverseXXDecl where XX is the type of the Decl.
 - The TraverseXXDecl will call TraverseDecl on all it's child nodes
 
@@ -304,9 +304,9 @@ The `RecursiveASTVisitor` class provides 3 different function groups which all c
 - `WalkUpFromDecl` which by default does nothing
 - `VisitDecl` which also does nothing by default
 
-Your first instinct looking at this list might be to overwrite the WalkUpFrom and Visit Decl groups... and it was mine as well, however as it turns out WalkUpFrom is called before actually visiting the Decl. This makes things a lot harder since for some Decl's it is important to know when we exit the Decl since classes can be nested and there would be no easy way to know if the member is part of the child class or the parent class. Sadly the only way to remedy this is by implementing the Traverse group which means that we must also handle the recursive visiting.
+Your first instinct looking at this list might be to overwrite the WalkUpFrom and Visit Decl groups... and it was mine as well, however as it turns out WalkUpFrom is called before actually visiting the Decl. This makes things a lot harder since for some Decl's it is important to know when we exit the Decl since classes can be nested and there would be no easy way to know if the member is part of the child class or the parent class. Sadly, the only way to remedy this is by implementing the Traverse group which means that we must also handle the recursive visiting.
 
-So... now that we know what group of functions to overwrite let's talk about the data we want to extract. Since we want our program to be user friendly we don't want to have our users worry about recursion and keeping track of where exactly in the AST we are. To solve this let's store the data in a more linear way by simply storing them inside vectors. We know that (most) objects have a Name, Namespace, FilePath and list of properties (for the reflection) so let's put those in a base class:
+So... now that we know what group of functions to overwrite let's talk about the data we want to extract. Since we want our program to be user friendly, we don't want to have our users worry about recursion and keeping track of where exactly in the AST we are. To solve this let's store the data in a more linear way by simply storing them inside vectors. We know that (most) objects have a Name, Namespace, File Path and list of properties (for the reflection) so let's put those in a base class:
 ```cpp
 struct Object {
     std::string name;
@@ -315,7 +315,7 @@ struct Object {
     std::vector<Property> properties{};
 };
 ```
-Now the objects we want to store are: Classes, Functions (and methods) and variables (and members) so let's make some classes for those which inherit from Object:
+Now the objects we want to store are Classes, Functions (and methods) and variables (and members) so let's make some classes for those which inherit from Object:
 ```cpp
 struct Variable : public Object {
     std::string type = "int";
@@ -370,7 +370,7 @@ public:
     bool TraverseFunctionDecl(clang::FunctionDecl *decl);
 };
 ```
-We use our class to represent a singular object file so we store all our objects in the class.
+We use our class to represent a singular object file, so we store all our objects in the class.
 
 Implementing these functions will follow the following template:
 ```cpp
@@ -413,9 +413,9 @@ std::string ASTFileParser::GetTypeAsString(const clang::NamedDecl &type) {
     return typeString;
 }
 ```
-This code should be pretty self explanatory, we retrieve the location of the type stored in the Decl and simply copy the text that is at that location in the file. Clang includes the static keyword by default which doesn't affect the type at all so we ignore it.
+This code should be self explanatory, we retrieve the location of the type stored in the Decl and simply copy the text that is at that location in the file. Clang includes the static keyword by default which doesn't affect the type at all, so we ignore it.
 
-Finally we will also write some functions which will parse the properties of the current object for reflection.
+Finally, we will also write some functions which will parse the properties of the current object for reflection.
 ```cpp
 std::vector<Property> ASTFileParser::GetProperties(const clang::Decl &decl, std::string keyword) {
     auto line = GetLineAbove(decl);
@@ -474,9 +474,9 @@ std::vector<Property> ASTFileParser::GetProperties(const clang::Decl &decl, std:
     return result;
 }
 ```
-once again this is pretty self explanatory but it's quite long so let's step through it.
+once again this is self explanatory but it's quite long so let's step through it.
 
-The very first thing we do is retrieve the line right above the decl which will be the properties. we use a small helper function for this that retrieves the line for us. After getting the line we check if the line starts with the provided keyword (The keywords we use are CGCLASS, CGFUNCTION, CGVARIABLE, CGMETHOD and CGMEMBER) if it does we know we found a valid property list and we can parse them. Next up is to find the start and end of the list of properties, we get the substring contained between the brackets and split it using the `,` as a separator. finally we split the parameter name and value and return the list of properties.
+The very first thing we do is retrieve the line right above the decl which will be the properties. we use a small helper function for this that retrieves the line for us. After getting the line we check if the line starts with the provided keyword (The keywords we use are CGCLASS, CGFUNCTION, CGVARIABLE, CGMETHOD and CGMEMBER) if it does, we know we found a valid property list and we can parse them. Next up is to find the start and end of the list of properties, we get the substring contained between the brackets and split it using the `,` as a separator. finally, we split the parameter name and value and return the list of properties.
 
 Most Traverse functions are roughly the same so let's talk about the `TraverseCXXRecordDecl`
 ```cpp
@@ -514,14 +514,14 @@ bool ASTFileParser::TraverseCXXRecordDecl(clang::CXXRecordDecl *decl) {
     return result;
 }
 ```
-To start of we test if the Decl is even from the file we want to parse, clang automatically includes files based on the includes of the current file. The `DeclIsIncluded` function simply compares the path of the decl and the current file and sees if they are the same. If they are not we won't even bother calling the recursive function as we can assume that all children of this decl are also in the other file (The exception would be leaked namespaces and incorrectly managed scope but since that is generally considered bad practice we will ignore that). After making sure we are in the right file we will parse the properties of the class, if the keyword is not found the GetProperties function will return an empty vector while otherwise the first value will always be the keyword. if the list of properties is empty we know that we don't have to bother recursing as we require a class to have properties before we will parse it. After getting the properties we fill in the other data which clang provides functions for that we can just call. Then we recurse and afterwards we pop the stack again.
+To start of we test if the Decl is even from the file we want to parse, clang automatically includes files based on the includes of the current file. The `DeclIsIncluded` function simply compares the path of the decl and the current file and sees if they are the same. If they are not, we won't even bother calling the recursive function as we can assume that all children of this decl are also in the other file (The exception would be leaked namespaces and incorrectly managed scope but since that is generally considered bad practice, we will ignore that). After making sure we are in the right file we will parse the properties of the class, if the keyword is not found the GetProperties function will return an empty vector while otherwise the first value will always be the keyword. if the list of properties is empty, we know that we don't have to bother recursing as we require a class to have properties before, we will parse it. After getting the properties we fill in the other data which clang provides functions for that we can just call. Then we recurse and afterwards we pop the stack again.
 
 Most other Decl's follow a similar pattern and can be found in the provided [source code](https://github.com/Cynic1254/Block-B-blog/blob/main/Code/src/FileParser.cpp)
 
-One difference I will note if for `TraverseParmVarDecl` as sometimes the AST will have a ParmVarDecl without being inside a function, this happens when a variable type is a callback at which point the AST will generate ParmVar nodes for the callbacks parameters. Due to this we first check if the function stack is empty and if it is we don't parse the parameter.
+One difference I will note if for `TraverseParmVarDecl` as sometimes the AST will have a ParmVarDecl without being inside a function, this happens when a variable type is a callback at which point the AST will generate ParmVar nodes for the callback’s parameters. Due to this we first check if the function stack is empty and if it is we don't parse the parameter.
 
 ### Using the data
-Now that we parsed our files we are left with a nice list of parsed data containing all the symbols we care about. The next step is to use the parsed data and create a class that users can use to define how to generate their files. For this we need a simple way to represent our files so let's create a class for it:
+Now that we parsed our files, we are left with a nice list of parsed data containing all the symbols we care about. The next step is to use the parsed data and create a class that users can use to define how to generate their files. For this we need a simple way to represent our files so let's create a class for it:
 ```cpp
 struct FullFunction {
     //allow the user to specify a string which will be inserted before the function
@@ -542,9 +542,9 @@ struct File  {
     std::unordered_map<std::string, FullFunction> functions;
 };
 ```
-by using a map to store our functions users can easily access any function they need regardless of if it exists or not, if it doesn't exist the map will simply create a new function. Our `FullFunction` object simply stores an instance of the `Function` object we created before as it is more than enough for our needs and we don't want to reinvent the wheel.
+by using a map to store our functions users can easily access any function they need regardless of if it exists or not, if it doesn't exist the map will simply create a new function. Our `FullFunction` object simply stores an instance of the `Function` object we created before as it is more than enough for our needs, and we don't want to reinvent the wheel.
 
-Let's take a look at our `FileGenerator` class:
+Let's look at our `FileGenerator` class:
 ```cpp
 class FileGenerator {
 public:
@@ -612,8 +612,9 @@ public:
 };
 ```
 
-since most of the functions are commented I won't discuss them right now but I would like to point out how we store our files, once again we use a map to store our data for the same reason as we did with our functions, It allows the user to easily access the data and not have to worry if the file exists or not. The class has 6 callback functions the user can bind which will get called whenever `Parse` is called. There are also a couple helper functions that the user can use.
+since most of the functions are commented I won't discuss them right now, but I would like to point out how we store our files, once again we use a map to store our data for the same reason as we did with our functions, It allows the user to easily access the data and not have to worry if the file exists or not. The class has 6 callback functions the user can bind which will get called whenever `Parse` is called. There are also a couple helper functions that the user can use.
 
+For now, lets take a look at the `WriteFiles` and `Parse` functions:
 ```cpp
 void FileGenerator::WriteFiles() {
     for( const auto& file : files)
@@ -735,7 +736,7 @@ void FileGenerator::Parse(const ASTFileParser &parser) {
 The `WriteFiles` function simply loops over all the data in the map and writes it to files.
 The `Parse` function calls the callback functions (if they are bound) on the data.
 
-Using this class we can write the following code to generate the LuaBindings shown earlier in the post:
+Using this class, we can write the following code to generate the LuaBindings shown earlier in the post:
 ```cpp
 const Class *currentClass = nullptr;
 
@@ -786,9 +787,9 @@ void HandleMethod(FileGenerator &fileGenerator, const Function &function) {
     }
 }
 ```
-As seen the user has to worry about little things as much care has been taken to make the experience as streamlined as possible, the only lines in the callbacks are those that output strings to the function body.
+As seen the user must worry about little things as much care has been taken to make the experience as streamlined as possible, the only lines in the callbacks are those that output strings to the function body.
 
 ## Final words
-Although not perfect I believe that having a simple way to do reflection is vital for many project and I hope that this blogpost and program encourage some people to make a better program (or improve the current one). I am very aware that this program has many shortcomings and this being my first experience with clang it also meant that I had to learn as I went. After writing this blog I will be working in a team to make a game engine and I hope I can convince people to use my program so it gets some more practical examples.
+Although not perfect I believe that having a simple way to do reflection is vital for many projects and I hope that this blogpost and program encourage some people to make a better program (or improve the current one). I am very aware that this program has many shortcomings and this being my first experience with clang it also meant that I had to learn as I went. After writing this blog I will be working in a team to make a game engine and I hope I can convince people to use my program, so it gets some more practical examples.
 
 All code showed is available to download and see on the [github page](https://github.com/Cynic1254/Block-B-blog/tree/main/Code).
