@@ -46,13 +46,13 @@ My aim was to make a small console based application that the user can invoke ju
 as an example:
 ```cpp
 CGCLASS(LuaClass)
-class Linker
+class Foo
 {
     CGMEMBER(LuaInspect)
-    std::unordered_map<std::string, std::shared_ptr<Parser>> objects;
+    std::unordered_map<std::string, std::shared_ptr<Bar>> Var;
 public:
    CGMETHOD(LuaInspect)
-    void Link(const std::shared_ptr<Parser>& parser);
+    void Func(const std::shared_ptr<Bar>& bar);
 };
 ```
 generates:
@@ -61,9 +61,9 @@ generates:
 
 void CreateBindings(sol::state& lua_state)
 {
-sol::usertype<Linker> Linker_table = lua_state.new_usertype<Linker>("Linker", sol::constructors<Linker()>{});
-Linker_table["Link"] = &Linker::Link();
-Linker_table["objects"] = &Linker::objects;
+sol::usertype<Foo> Foo_table = lua_state.new_usertype<Foo>("Foo", sol::constructors<Foo()>{});
+Foo_table["Func"] = &Foo::Func();
+Foo_table["Var"] = &Foo::Var;
 }
 ```
 In this example you can see a small input class which is marked with Macro's, these macro's tell the program that this class and these members should be remembered. Additionally parameters have been provided to mark the class as being accessible in Lua. The program sees these macro's and parameters and automatically generates the output file based on them. The output file contains a function to create bindings for Lua.
