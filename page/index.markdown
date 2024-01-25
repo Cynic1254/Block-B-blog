@@ -789,6 +789,31 @@ void HandleMethod(FileGenerator &fileGenerator, const Function &function) {
 ```
 As seen the user must worry about little things as much care has been taken to make the experience as streamlined as possible, the only lines in the callbacks are those that output strings to the function body.
 
+Running the file over the input gives us the output as showcased in the example:
+
+```cpp
+CGCLASS(LuaClass)
+class Foo
+{
+    CGMEMBER(LuaInspect)
+    std::unordered_map<std::string, std::shared_ptr<Bar>> Var;
+public:
+   CGMETHOD(LuaInspect)
+    void Func(const std::shared_ptr<Bar>& bar);
+};
+```
+generates:
+```cpp
+#include "C:\Users\games\source\github\Code-Generation\Code_Generation\include\Linker.hpp"
+
+void CreateBindings(sol::state& lua_state)
+{
+sol::usertype<Foo> Foo_table = lua_state.new_usertype<Foo>("Foo", sol::constructors<Foo()>{});
+Foo_table["Func"] = &Foo::Func();
+Foo_table["Var"] = &Foo::Var;
+}
+```
+
 ## Final words
 Although not perfect I believe that having a simple way to do reflection is vital for many projects and I hope that this blogpost and program encourage some people to make a better program (or improve the current one). I am very aware that this program has many shortcomings and this being my first experience with clang it also meant that I had to learn as I went. After writing this blog I will be working in a team to make a game engine and I hope I can convince people to use my program, so it gets some more practical examples.
 
